@@ -1,255 +1,135 @@
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #f0f2f5;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    margin: 0;
+// Dữ liệu từ vựng từ bức ảnh của bạn
+const vocabulary = [
+    { word: "concern", pos: "n", ipa: "/kən'sɜːn/", level: "B2", vi: "mối lo ngại", syn: "worry, apprehension", ant: "unconcern" },
+    { word: "confuse", pos: "v", ipa: "/kən'fjuːz/", level: "B2", vi: "làm bối rối", syn: "bewilder, puzzle", ant: "" },
+    { word: "consistency", pos: "n", ipa: "/kən'sɪstənsi/", level: "C1", vi: "sự nhất quán, kiên định", syn: "steadfastness", ant: "inconsistency" },
+    { word: "demanding", pos: "adj", ipa: "/dɪ'mɑːndɪŋ/", level: "B2", vi: "đòi hỏi cao, khó khăn", syn: "challenging, taxing", ant: "undemanding, easy" },
+    { word: "desperate", pos: "adj", ipa: "/'despərət/", level: "B2", vi: "tuyệt vọng", syn: "hopeless", ant: "hopeful" },
+    { word: "distribution", pos: "n", ipa: "/ˌdɪstrɪ'bjuːʃn/", level: "B2", vi: "sự phân phối, phân bố", syn: "allocation", ant: "" },
+    { word: "emergence", pos: "n", ipa: "/ɪ'mɜːdʒəns/", level: "C1", vi: "sự xuất hiện, nổi lên", syn: "appearance, rise", ant: "disappearance" },
+    { word: "enemy", pos: "n", ipa: "/'enəmi/", level: "B1", vi: "kẻ thù", syn: "foe, adversary", ant: "friend, ally" },
+    { word: "enhance", pos: "v", ipa: "/ɪn'hɑːns/", level: "B2", vi: "nâng cao, tăng cường", syn: "improve, boost", ant: "diminish, reduce" },
+    { word: "essential", pos: "adj", ipa: "/ɪ'senʃl/", level: "B1", vi: "cần thiết, thiết yếu", syn: "vital, crucial", ant: "unnecessary" },
+    { word: "ethically", pos: "adv", ipa: "/'eθɪkli/", level: "C1", vi: "về mặt đạo đức", syn: "morally", ant: "unethically" },
+    { word: "evolve", pos: "v", ipa: "/ɪ'vɒlv/", level: "C1", vi: "phát triển, tiến hóa", syn: "develop, grow", ant: "" },
+    { word: "expense", pos: "n", ipa: "/ɪk'spens/", level: "B2", vi: "chi phí", syn: "outlay", ant: "" },
+    { word: "expert", pos: "n", ipa: "/'ekspɜːt/", level: "B1", vi: "chuyên gia", syn: "specialist, master", ant: "novice, amateur" },
+    { word: "exploit", pos: "v", ipa: "/ɪk'splɔɪt/", level: "B2", vi: "khai thác, bóc lột", syn: "-", ant: "-" },
+    { word: "financial", pos: "adj", ipa: "/faɪ'nænʃl/", level: "B1", vi: "thuộc về tài chính", syn: "-", ant: "-" },
+    { word: "firm", pos: "adj", ipa: "/fɜːm/", level: "B2", vi: "kiên quyết, vững chắc", syn: "resolute, determined", ant: "irresolute" },
+    { word: "frustrated", pos: "adj", ipa: "/frʌ'streɪtɪd/", level: "C1", vi: "thất vọng, bực bội", syn: "annoyed, angry", ant: "" }
+];
+
+let currentIndex = 0;
+let quizIndex = 0;
+let score = 0;
+
+// Chuyển Tab (Flashcard <-> Quiz)
+function switchTab(tabName) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-menu button').forEach(el => el.classList.remove('active'));
+
+    if (tabName === 'card') {
+        document.getElementById('tab-card').classList.add('active');
+        document.getElementById('btn-tab-card').classList.add('active');
+    } else {
+        document.getElementById('tab-quiz').classList.add('active');
+        document.getElementById('btn-tab-quiz').classList.add('active');
+        initQuiz();
+    }
 }
 
-.container {
-    text-align: center;
-    width: 90%;
-    max-width: 480px;
-    background: #ffffff;
-    padding: 25px;
-    border-radius: 20px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+// ---- LOGIC FLASHCARD ----
+function updateCard() {
+    const data = vocabulary[currentIndex];
+    document.getElementById("word-en").innerText = data.word;
+    document.getElementById("word-ipa").innerText = data.ipa;
+    document.getElementById("word-pos").innerText = `(${data.pos})`;
+    document.getElementById("word-level").innerText = data.level;
+    document.getElementById("word-vi").innerText = data.vi;
+    document.getElementById("word-syn").innerText = data.syn || "Không có";
+    document.getElementById("word-ant").innerText = data.ant || "Không có";
+    document.getElementById("card-counter").innerText = `${currentIndex + 1} / ${vocabulary.length}`;
+    
+    document.getElementById("flashcard").classList.remove("flipped");
 }
 
-h1 {
-    color: #1a73e8;
-    font-size: 22px;
-    margin-top: 0;
-    margin-bottom: 20px;
+function flipCard() {
+    document.getElementById("flashcard").classList.toggle("flipped");
 }
 
-/* Tab Navigation */
-.tab-menu {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-    background: #f1f3f4;
-    padding: 5px;
-    border-radius: 12px;
+function nextWord() {
+    currentIndex = (currentIndex + 1) % vocabulary.length;
+    updateCard();
 }
 
-.tab-menu button {
-    flex: 1;
-    background: transparent;
-    color: #5f6368;
-    border: none;
-    padding: 10px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 14px;
-    transition: all 0.3s;
+function prevWord() {
+    currentIndex = (currentIndex - 1 + vocabulary.length) % vocabulary.length;
+    updateCard();
 }
 
-.tab-menu button.active {
-    background: #ffffff;
-    color: #1a73e8;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+function speakWord(event) {
+    if (event) event.stopPropagation();
+    const word = vocabulary[currentIndex].word;
+    const utterance = new SpeechSynthesisUtterance(word);
+    utterance.lang = 'en-US';
+    window.speechSynthesis.speak(utterance);
 }
 
-.tab-content {
-    display: none;
+// ---- LOGIC QUIZ (LIỆN ĐIỀN TỪ) ----
+function initQuiz() {
+    quizIndex = Math.floor(Math.random() * vocabulary.length);
+    showQuizQuestion();
 }
 
-.tab-content.active {
-    display: block;
+function showQuizQuestion() {
+    const data = vocabulary[quizIndex];
+    document.getElementById("quiz-vi").innerText = data.vi;
+    document.getElementById("quiz-level").innerText = data.level;
+    document.getElementById("quiz-hint").innerText = `Gợi ý: ${data.word.length} ký tự (bắt đầu bằng "${data.word[0]}")`;
+    
+    document.getElementById("user-input").value = "";
+    document.getElementById("user-input").disabled = false;
+    document.getElementById("user-input").focus();
+    
+    const feedback = document.getElementById("quiz-feedback");
+    feedback.className = "feedback";
+    feedback.innerText = "";
+    
+    document.getElementById("btn-next-quiz").style.display = "none";
 }
 
-/* Flashcard */
-.card {
-    background-color: transparent;
-    height: 260px;
-    perspective: 1000px;
-    cursor: pointer;
-    margin-bottom: 20px;
+function checkAnswer(event) {
+    event.preventDefault();
+    const input = document.getElementById("user-input").value.trim().toLowerCase();
+    const target = vocabulary[quizIndex].word.toLowerCase();
+    const feedback = document.getElementById("quiz-feedback");
+
+    if (!input) return;
+
+    if (input === target) {
+        score += 10;
+        document.getElementById("score").innerText = score;
+        feedback.innerText = "🎉 Chính xác! Tuyệt vời!";
+        feedback.className = "feedback correct";
+        
+        // Tự động phát âm từ vừa gõ đúng
+        const utterance = new SpeechSynthesisUtterance(target);
+        utterance.lang = 'en-US';
+        window.speechSynthesis.speak(utterance);
+    } else {
+        feedback.innerHTML = `❌ Chưa đúng! Đáp án đúng là: <strong>${target}</strong> (${vocabulary[quizIndex].ipa})`;
+        feedback.className = "feedback wrong";
+    }
+
+    document.getElementById("user-input").disabled = true;
+    document.getElementById("btn-next-quiz").style.display = "block";
 }
 
-.card-inner {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    text-align: center;
-    transition: transform 0.6s;
-    transform-style: preserve-3d;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.08);
-    border-radius: 15px;
-    border: 1px solid #e0e0e0;
+function nextQuizQuestion() {
+    quizIndex = (quizIndex + 1) % vocabulary.length;
+    showQuizQuestion();
 }
 
-.card.flipped .card-inner {
-    transform: rotateY(180deg);
-}
-
-.card-front, .card-back {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-    border-radius: 15px;
-    background: white;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-    box-sizing: border-box;
-}
-
-.card-back {
-    transform: rotateY(180deg);
-    background: #f8fafd;
-}
-
-.level {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    background: #e53935;
-    color: white;
-    padding: 3px 8px;
-    border-radius: 6px;
-    font-weight: bold;
-    font-size: 12px;
-}
-
-h2 {
-    font-size: 30px;
-    margin: 10px 0 5px 0;
-    color: #2c3e50;
-}
-
-.btn-audio {
-    background: #e8f0fe;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 20px;
-    cursor: pointer;
-    color: #1a73e8;
-    font-weight: bold;
-    margin-top: 10px;
-}
-
-.controls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-button {
-    background: #1a73e8;
-    color: white;
-    border: none;
-    padding: 10px 18px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: bold;
-}
-
-button:hover {
-    background: #1557b0;
-}
-
-/* Quiz Box */
-.quiz-box {
-    background: #f8fafd;
-    border: 1px solid #e0e0e0;
-    border-radius: 15px;
-    padding: 20px;
-    position: relative;
-}
-
-.quiz-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-}
-
-.score-badge {
-    background: #e6f4ea;
-    color: #137333;
-    padding: 5px 12px;
-    border-radius: 15px;
-    font-size: 14px;
-    font-weight: bold;
-}
-
-.quiz-prompt {
-    margin: 15px 0;
-}
-
-.quiz-label {
-    color: #70757a;
-    font-size: 13px;
-    margin: 0;
-}
-
-.quiz-prompt h3 {
-    font-size: 24px;
-    color: #202124;
-    margin: 8px 0;
-}
-
-.quiz-hint {
-    color: #1a73e8;
-    font-size: 13px;
-    font-weight: 500;
-}
-
-.quiz-form {
-    display: flex;
-    gap: 8px;
-    margin-top: 15px;
-}
-
-input[type="text"] {
-    flex: 1;
-    padding: 12px;
-    border: 2px solid #dadce0;
-    border-radius: 8px;
-    font-size: 16px;
-    outline: none;
-}
-
-input[type="text"]:focus {
-    border-color: #1a73e8;
-}
-
-.feedback {
-    margin-top: 15px;
-    padding: 10px;
-    border-radius: 8px;
-    font-weight: bold;
-    display: none;
-}
-
-.feedback.correct {
-    display: block;
-    background: #e6f4ea;
-    color: #137333;
-}
-
-.feedback.wrong {
-    display: block;
-    background: #fce8e6;
-    color: #c5221f;
-}
-
-.btn-next-quiz {
-    width: 100%;
-    margin-top: 15px;
-    background: #34a853;
-}
-
-.btn-next-quiz:hover {
-    background: #2d9247;
-}
+// Khởi tạo mặt định
+updateCard();
