@@ -9,29 +9,64 @@
 <body>
     <div class="container">
         <h1>📚 Ôn Tập Từ Vựng (B1 - C1)</h1>
-        
-        <div class="card" id="flashcard" onclick="flipCard()">
-            <div class="card-inner" id="card-inner">
-                <div class="card-front">
-                    <span class="level" id="word-level">B2</span>
-                    <h2 id="word-en">Word</h2>
-                    <p id="word-ipa">/phonetic/</p>
-                    <p id="word-pos"><i>(pos)</i></p>
-                    <button onclick="speakWord(event)" class="btn-audio">🔊 Nghe phát âm</button>
+
+        <!-- Menu Chuyển Chế Độ -->
+        <div class="tab-menu">
+            <button id="btn-tab-card" class="active" onclick="switchTab('card')">🎴 Flashcard</button>
+            <button id="btn-tab-quiz" onclick="switchTab('quiz')">✍️ Luyện Điền Từ</button>
+        </div>
+
+        <!-- 1. CHẾ ĐỘ FLASHCARD -->
+        <div id="tab-card" class="tab-content active">
+            <div class="card" id="flashcard" onclick="flipCard()">
+                <div class="card-inner" id="card-inner">
+                    <div class="card-front">
+                        <span class="level" id="word-level">B2</span>
+                        <h2 id="word-en">Word</h2>
+                        <p id="word-ipa">/phonetic/</p>
+                        <p id="word-pos"><i>(pos)</i></p>
+                        <button onclick="speakWord(event)" class="btn-audio">🔊 Nghe phát âm</button>
+                    </div>
+                    <div class="card-back">
+                        <h3 id="word-vi">Nghĩa tiếng Việt</h3>
+                        <p><strong>Đồng nghĩa:</strong> <span id="word-syn">-</span></p>
+                        <p><strong>Trái nghĩa:</strong> <span id="word-ant">-</span></p>
+                    </div>
                 </div>
-                <div class="card-back">
-                    <h3 id="word-vi">Nghĩa tiếng Việt</h3>
-                    <p><strong>Đồng nghĩa:</strong> <span id="word-syn">-</span></p>
-                    <p><strong>Trái nghĩa:</strong> <span id="word-ant">-</span></p>
-                </div>
+            </div>
+
+            <div class="controls">
+                <button onclick="prevWord()">⬅️ Từ trước</button>
+                <span id="card-counter">1 / 18</span>
+                <button onclick="nextWord()">Từ sau ➡️</button>
             </div>
         </div>
 
-        <div class="controls">
-            <button onclick="prevWord()">⬅️ Từ trước</button>
-            <span id="card-counter">1 / 18</span>
-            <button onclick="nextWord()">Từ sau ➡️</button>
+        <!-- 2. CHẾ ĐỘ LIỆN ĐIỀN TỪ -->
+        <div id="tab-quiz" class="tab-content">
+            <div class="quiz-box">
+                <div class="quiz-header">
+                    <span class="score-badge">Điểm: <strong id="score">0</strong></span>
+                    <span class="level" id="quiz-level">B2</span>
+                </div>
+
+                <div class="quiz-prompt">
+                    <p class="quiz-label">Nghĩa tiếng Việt:</p>
+                    <h3 id="quiz-vi">mối lo ngại</h3>
+                    <p class="quiz-hint" id="quiz-hint">Gợi ý: 7 ký tự (c...)</p>
+                </div>
+
+                <form onsubmit="checkAnswer(event)" class="quiz-form">
+                    <input type="text" id="user-input" placeholder="Nhập từ tiếng Anh..." autocomplete="off" autofocus>
+                    <button type="submit" class="btn-check">Kiểm Tra</button>
+                </form>
+
+                <div id="quiz-feedback" class="feedback"></div>
+
+                <button id="btn-next-quiz" onclick="nextQuizQuestion()" class="btn-next-quiz" style="display: none;">CÂU TIẾP THEO ➡️</button>
+            </div>
         </div>
+
     </div>
 
     <script src="script.js"></script>
